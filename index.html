@@ -792,7 +792,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedUrl = localStorage.getItem('emaar_sheet_url');
   if (savedUrl) {
     document.getElementById('sheetUrlInput').value = savedUrl;
-    hideBanner();
+    if (!silent) hideBanner();
     loadRates();
   } else {
     // No sheet connected yet — load sample data so the portal
