@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kashmir Hotel Rates Portal — Emaar Tour and Travels</title>
+  <meta name="description" content="Internal hotel rate management portal for Emaar Tour and Travels, Kashmir.">
+
+  <!-- Google Fonts: Syne (headings) + Plus Jakarta Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================================================
+       DESIGN TOKENS — Edit these to match your brand
+       ================================================================ */
+    :root {
+      --bg:           #eef4fb;
+      --surface:      #ffffff;
+      --header-bg:    #0c2d4a;   /* deep navy */
+      --primary:      #0284c7;
+      --primary-dark: #0369a1;
+      --accent:       #f59e0b;
+      --accent-light: #fef3c7;
+      --green:        #059669;
+      --text:         #0f172a;
+      --muted:        #5b7a8f;
+      --border:       #dde8f2;
+      --rate-bg:      #f0f9ff;
+      --rate-color:   #0369a1;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.04);
+      --shadow-md:    0 4px 20px rgba(0,0,0,.08);
+      --radius:       10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ================================================================
+       HEADER / TOP BAR
+       ================================================================ */
+    .header {
+      background: var(--header-bg);
+      color: white;
+      padding: 0 24px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), #38bdf8);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      box-shadow: 0 2px 8px rgba(2,132,199,.4);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #syncBadge {
+      font-size: 11px;
+      color: rgba(255,255,255,0.38);
+      white-space: nowrap;
+      display: none;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(.97); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.85);
+      border: 1px solid rgba(255,255,255,.13);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.15); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-export {
+      background: var(--accent);
+      color: #78350f;
+    }
+    .btn-export:hover { background: #fbbf24; }
+
+    .btn-sm {
+      padding: 5px 11px;
+      font-size: 12px;
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .btn-reset:hover { background: #e2e8f0; }
+
+    /* ================================================================
+       SETUP BANNER — shown when no sheet is connected
+       ================================================================ */
+    .setup-banner {
+      background: linear-gradient(135deg, #1d4ed8, var(--primary));
+      color: white;
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .setup-banner.hidden { display: none; }
+
+    .setup-banner-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .setup-banner p {
+      font-size: 12.5px;
+      opacity: 0.85;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .setup-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .setup-input {
+      flex: 1;
+      min-width: 260px;
+      max-width: 460px;
+      padding: 8px 13px;
+      border-radius: 7px;
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.15);
+      color: white;
+      font-family: monospace;
+      font-size: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .setup-input::placeholder { color: rgba(255,255,255,.45); }
+    .setup-input:focus { outline: none; border-color: rgba(255,255,255,.6); }
+
+    .setup-help {
+      margin-top: 10px;
+      font-size: 11.5px;
+      opacity: 0.65;
+    }
+    .setup-help a { color: rgba(255,255,255,.9); }
+
+    /* ================================================================
+       MAIN CONTAINER
+       ================================================================ */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px 20px 48px;
+    }
+
+    /* ================================================================
+       FILTER PANEL
+       ================================================================ */
+    .filter-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .filter-panel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-panel-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .filter-grid {
+      display: grid;
+      /* Responsive: fill with 160px-min columns, max 7 columns */
+      grid-template-columns: 2fr repeat(6, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    /* Field labels */
+    .fg label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    /* All filter inputs share same style */
+    .fg select,
+    .fg input[type="text"],
+    .fg input[type="date"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color .15s, background .15s;
+      appearance: none;
+    }
+
+    .fg select:focus,
+    .fg input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(2,132,199,.1);
+    }
+
+    /* Search field gets a magnifying glass prefix */
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      padding-left: 34px !important;
+    }
+
+    /* ================================================================
+       STATS BAR
+       ================================================================ */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .results-info {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .results-info strong { color: var(--text); font-weight: 600; }
+
+    .legend {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .legend span {
+      display: inline-block;
+      background: var(--rate-bg);
+      color: var(--rate-color);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 2px;
+    }
+
+    /* ================================================================
+       DATA TABLE
+       ================================================================ */
+    .table-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      background: #f7fafd;
+      /* NOTE: sticky thead removed — it caused the first data row to visually
+         bleed above the column headers in Chrome/Edge due to stacking context conflicts. */
+    }
+
+    th {
+      padding: 11px 13px;
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      border-bottom: 2px solid var(--border);
+    }
+
+    /* Rate plan columns have a distinct background to group them visually */
+    th.th-rate {
+      text-align: right;
+      background: var(--rate-bg);
+      color: var(--primary-dark);
+    }
+
+    th.th-rate:first-of-type { border-left: 2px solid #bae6fd; }
+
+    td {
+      padding: 11px 13px;
+      border-bottom: 1px solid #f0f6fc;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover td { background: #f8fbff; }
+
+    td.td-rate {
+      text-align: right;
+      font-weight: 500;
+      color: var(--rate-color);
+      font-variant-numeric: tabular-nums;
+    }
+
+    td.td-rate.na { color: #c8d8e8; font-size: 12px; }
+
+    td.td-rate:first-of-type { border-left: 2px solid #bae6fd; }
+
+    /* Hotel name column */
+    .hotel-name {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .hotel-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Pill badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-place  { background: #e0f2fe; color: #0369a1; }
+    .badge-star   { background: var(--accent-light); color: #92400e; }
+    .badge-season { background: #dcfce7; color: #166534; font-size: 10.5px; }
+
+    .date-range {
+      font-size: 11.5px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ================================================================
+       LOADING / EMPTY STATES
+       ================================================================ */
+    .state-box {
+      text-align: center;
+      padding: 64px 20px;
+      color: var(--muted);
+    }
+
+    .state-box .icon { font-size: 44px; display: block; margin-bottom: 14px; }
+
+    .state-box h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .state-box p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Spinning loader */
+    .loader {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ================================================================
+       FOOTER
+       ================================================================ */
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    /* ================================================================
+       TOAST NOTIFICATION
+       ================================================================ */
+    #toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #1e293b;
+      color: white;
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .25s ease;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    }
+
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ================================================================
+       RESPONSIVE — Tablet / Mobile
+       ================================================================ */
+    @media (max-width: 900px) {
+      .filter-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      /* Hotel name search spans full row on mobile */
+      .fg.fg-search { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 0 14px; }
+      .brand-sub { display: none; }
+      #syncBadge { display: none !important; }
+      .container { padding: 14px 12px 32px; }
+      .filter-grid { grid-template-columns: 1fr 1fr; }
+      .brand-title { font-size: 15px; }
+      .legend { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================================================
+     HEADER
+     =================================================== -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-icon">🏔️</div>
+    <div>
+      <div class="brand-title">Hotel Rates Portal</div>
+      <div class="brand-sub">Emaar Tour and Travels · Kashmir</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <span id="syncBadge"></span>
+    <button class="btn btn-ghost" onclick="loadRates(true)" title="Refresh data from Google Sheet">
+      <!-- Refresh icon -->
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+      </svg>
+      Refresh
+    </button>
+    <button class="btn btn-export" onclick="exportCSV()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export CSV
+    </button>
+  </div>
+</header>
+
+<!-- ===================================================
+     MAIN CONTENT
+     =================================================== -->
+<main class="container">
+
+  <!-- ── SETUP BANNER ── -->
+  <div class="setup-banner" id="setupBanner">
+    <div class="setup-banner-title">⚙️ Connect Your Google Sheet</div>
+    <p>
+      Paste the <strong>published CSV link</strong> of your Google Sheet below.
+      In Google Sheets: <em>File → Share → Publish to web → Select your sheet → CSV → Publish</em>.
+      Then copy the link and paste it here. You only need to do this once.
+    </p>
+    <div class="setup-row">
+      <input
+        type="text"
+        class="setup-input"
+        id="sheetUrlInput"
+        placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?output=csv"
+      >
+      <button class="btn btn-primary" onclick="connectSheet()">Connect Sheet</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadSampleData()">Load Sample Data</button>
+    </div>
+    <p class="setup-help">
+      🔒 Your Sheet URL is saved in your browser only. No data is sent to any server.
+      &nbsp;|&nbsp;
+      <a href="README.md" target="_blank">Read setup guide →</a>
+    </p>
+  </div>
+
+  <!-- ── FILTER PANEL ── -->
+  <div class="filter-panel">
+    <div class="filter-panel-top">
+      <span class="filter-panel-label">
+        <!-- Filter icon -->
+        <svg style="width:12px;height:12px;vertical-align:middle;margin-right:5px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filters
+      </span>
+      <button class="btn btn-reset btn-sm" onclick="resetFilters()">Reset All</button>
+    </div>
+
+    <div class="filter-grid">
+      <!-- 1. Hotel search (wider column) -->
+      <div class="fg fg-search">
+        <label>Search Hotel Name</label>
+        <div class="search-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="f-search" placeholder="Type hotel name…" oninput="applyFilters()">
+        </div>
+      </div>
+
+      <!-- 2. Place -->
+      <div class="fg">
+        <label>Destination</label>
+        <select id="f-place" onchange="applyFilters()">
+          <option value="">All Places</option>
+        </select>
+      </div>
+
+      <!-- 3. Star Category -->
+      <div class="fg">
+        <label>Star Category</label>
+        <select id="f-star" onchange="applyFilters()">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+
+      <!-- 4. Room Type -->
+      <div class="fg">
+        <label>Room Type</label>
+        <select id="f-room" onchange="applyFilters()">
+          <option value="">All Room Types</option>
+        </select>
+      </div>
+
+      <!-- 5. Month picker (auto-sets date range) -->
+      <div class="fg">
+        <label>Month (Quick Pick)</label>
+        <select id="f-month" onchange="onMonthChange()">
+          <option value="">All Months</option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+
+      <!-- 6. Check-in date -->
+      <div class="fg">
+        <label>Check-in Date</label>
+        <input type="date" id="f-datefrom" onchange="syncMonthFromDate(); applyFilters();">
+      </div>
+
+      <!-- 7. Check-out date -->
+      <div class="fg">
+        <label>Check-out Date</label>
+        <input type="date" id="f-dateto" onchange="applyFilters()">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar">
+    <div class="results-info" id="resultsInfo">—</div>
+    <div class="legend">
+      Rate plans per room per night (₹) &nbsp;·&nbsp;
+      <span>EP</span> Room Only &nbsp;
+      <span>CP</span> +Breakfast &nbsp;
+      <span>MAP</span> +B+D &nbsp;
+      <span>AP</span> All Meals &nbsp;
+      <span>EB</span> Extra Bed &nbsp;
+      <span>CWB</span> Child With Bed
+    </div>
+  </div>
+
+  <!-- ── DATA TABLE ── -->
+  <div class="table-card">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Hotel Name</th>
+            <th>Destination</th>
+            <th>Category</th>
+            <th>Room Type</th>
+            <th>Valid Period</th>
+            <th>Season</th>
+            <th class="th-rate">EP</th>
+            <th class="th-rate">CP</th>
+            <th class="th-rate">MAP</th>
+            <th class="th-rate">AP</th>
+            <th class="th-rate">EB</th>
+            <th class="th-rate">CWB</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="ratesBody">
+          <!-- Initial empty state -->
+          <tr>
+            <td colspan="13">
+              <div class="state-box">
+                <span class="icon">🏨</span>
+                <h3>Welcome to the Hotel Rates Portal</h3>
+                <p>Connect your Google Sheet using the setup panel above,<br>or load the sample data to preview the interface.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Kashmir Hotel Rates Portal &nbsp;·&nbsp; Emaar Tour and Travels &nbsp;·&nbsp;
+    Data refreshes automatically every 5 minutes when connected.
+  </div>
+
+</main>
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<!-- ===================================================
+     JAVASCRIPT
+     =================================================== -->
+<script>
+// ============================================================
+// CONFIGURATION — You can change the refresh interval here
+// ============================================================
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+const CURRENCY = '₹';
+
+// Column name mappings — these must match the headers in your Google Sheet
+// (lowercase, underscores). Change these if you rename your sheet columns.
+const COL = {
+  hotel:   'hotel_name',
+  place:   'place',
+  star:    'star_category',
+  room:    'room_type',
+  from:    'date_from',
+  to:      'date_to',
+  season:  'season_label',
+  daytype: 'day_type',
+  ep:      'ep',
+  cp:      'cp',
+  map:     'map',
+  ap:      'ap',
+  eb:      'eb',
+  cwb:     'cwb',
+  notes:   'notes',
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let allRates = [];      // all rows from the sheet
+let filtered = [];      // rows after filters
+let refreshTimer = null;
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const savedUrl = localStorage.getItem('emaar_sheet_url');
+  if (savedUrl) {
+    document.getElementById('sheetUrlInput').value = savedUrl;
+    hideBanner();
+    loadRates();
+  } else {
+    // No sheet connected yet — load sample data so the portal
+    // looks full and useful from the very first visit
+    loadSampleData(/*silent=*/true);
+  }
+  // Default month = current month
+  document.getElementById('f-month').value = new Date().getMonth() + 1;
+  onMonthChange();
+});
+
+// ============================================================
+// SHEET CONNECTION
+// ============================================================
+function connectSheet() {
+  const url = document.getElementById('sheetUrlInput').value.trim();
+  if (!url || !url.startsWith('http')) {
+    showToast('⚠️ Please paste a valid Google Sheet URL'); return;
+  }
+  localStorage.setItem('emaar_sheet_url', url);
+  hideBanner();
+  loadRates(true);
+}
+
+function hideBanner() {
+  document.getElementById('setupBanner').classList.add('hidden');
+}
+
+function getSheetUrl() {
+  return localStorage.getItem('emaar_sheet_url') || '';
+}
+
+// ============================================================
+// FETCH + PARSE DATA FROM GOOGLE SHEET
+// ============================================================
+async function loadRates(showFeedback = false) {
+  const url = getSheetUrl();
+  if (!url) return;
+
+  setBodyLoading();
+
+  try {
+    // Cache-bust so we always get fresh data from Google's CDN
+    const fetchUrl = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
+    const res = await fetch(fetchUrl);
+    if (!res.ok) throw new Error(`Server returned ${res.status} — check your sheet URL.`);
+
+    const text = await res.text();
+    if (!text.trim()) throw new Error('The sheet appears to be empty.');
+
+    allRates = parseCSV(text);
+    if (allRates.length === 0) throw new Error('Could not read any rows. Check your sheet has data and is published.');
+
+    // Rebuild dynamic filter dropdowns
+    buildFilterOptions();
+    applyFilters();
+
+    // Update header sync badge
+    const badge = document.getElementById('syncBadge');
+    badge.style.display = 'inline';
+    badge.textContent = `Synced ${new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'})}`;
+
+    if (showFeedback) showToast(`✓ Loaded ${allRates.length} rate records`);
+
+    // Schedule next auto-refresh
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => loadRates(), REFRESH_INTERVAL_MS);
+
+  } catch (err) {
+    console.error(err);
+    setBodyError(err.message);
+    document.getElementById('syncBadge').style.display = 'none';
+    showToast('❌ ' + err.message);
+  }
+}
+
+// ============================================================
+// CSV PARSER — handles quoted fields, commas inside quotes,
+//              Windows (CRLF) and Unix (LF) line endings
+// ============================================================
+function parseCSV(text) {
+  const rows = [];
+  let field = '', row = [], inQ = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], nx = text[i + 1];
+
+    if (c === '"') {
+      if (inQ && nx === '"') { field += '"'; i++; }   // escaped ""
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) {
+      row.push(field.trim()); field = '';
+    } else if ((c === '\n' || c === '\r') && !inQ) {
+      if (c === '\r' && nx === '\n') i++;              // skip \r in \r\n
+      row.push(field.trim()); field = '';
+      if (row.some(f => f !== '')) rows.push(row);
+      row = [];
+    } else {
+      field += c;
+    }
+  }
+  // Flush the very last field/row
+  row.push(field.trim());
+  if (row.some(f => f !== '')) rows.push(row);
+
+  if (rows.length < 2) return [];   // no data rows
+
+  // Normalize headers: lowercase + underscores (handles spaces, dashes, slashes)
+  const headers = rows[0].map(h =>
+    h.toLowerCase().replace(/[\s\-\/\\]+/g, '_').replace(/[^a-z0-9_]/g, '')
+  );
+
+  // Map each data row to a plain object
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (r[i] ?? '').trim(); });
+    return obj;
+  });
+}
+
+// ============================================================
+// BUILD FILTER DROPDOWNS dynamically from sheet data
+// ============================================================
+function buildFilterOptions() {
+  const get = key => [...new Set(allRates.map(r => r[key]).filter(Boolean))].sort();
+  populateSelect('f-place', get(COL.place));
+  populateSelect('f-star',  get(COL.star));
+  populateSelect('f-room',  get(COL.room));
+}
+
+function populateSelect(id, values) {
+  const sel = document.getElementById(id);
+  const prev = sel.value; // remember selection
+  while (sel.options.length > 1) sel.remove(1);
+  values.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+// ============================================================
+// FILTER LOGIC
+// ============================================================
+function applyFilters() {
+  const search   = document.getElementById('f-search').value.toLowerCase().trim();
+  const place    = document.getElementById('f-place').value;
+  const star     = document.getElementById('f-star').value;
+  const room     = document.getElementById('f-room').value;
+  const dateFrom = document.getElementById('f-datefrom').value;
+  const dateTo   = document.getElementById('f-dateto').value;
+
+  filtered = allRates.filter(r => {
+    // Hotel name search
+    if (search && !(r[COL.hotel] || '').toLowerCase().includes(search)) return false;
+
+    // Dropdown filters (exact match when selected)
+    if (place && r[COL.place] !== place) return false;
+    if (star  && r[COL.star]  !== star)  return false;
+    if (room  && r[COL.room]  !== room)  return false;
+
+    // Date overlap filter:
+    // A rate row is RELEVANT if its [date_from, date_to] window OVERLAPS the selected [dateFrom, dateTo].
+    // Two ranges overlap when: A.from <= B.to AND A.to >= B.from
+    if (dateFrom || dateTo) {
+      const rFrom = parseSheetDate(r[COL.from]);
+      const rTo   = parseSheetDate(r[COL.to]);
+
+      if (rFrom && rTo) {
+        const sFrom = dateFrom ? new Date(dateFrom) : null;
+        const sTo   = dateTo   ? new Date(dateTo)   : null;
+
+        if (sFrom && sTo && (rFrom > sTo || rTo < sFrom)) return false;
+        if (sFrom && !sTo && rTo < sFrom) return false;
+        if (!sFrom && sTo && rFrom > sTo) return false;
+      }
+    }
+
+    return true;
+  });
+
+  renderTable();
+
+  const info = document.getElementById('resultsInfo');
+  info.innerHTML = `<strong>${filtered.length}</strong> rate${filtered.length !== 1 ? 's' : ''} found` +
+    (allRates.length > 0 ? ` <span style="opacity:.5">of ${allRates.length} total</span>` : '');
+}
+
+// When user picks a month, auto-set date range to that full month
+function onMonthChange() {
+  const month = parseInt(document.getElementById('f-month').value);
+  if (!month) {
+    document.getElementById('f-datefrom').value = '';
+    document.getElementById('f-dateto').value = '';
+    applyFilters();
+    return;
+  }
+  const yr = new Date().getFullYear();
+  const pad = n => String(n).padStart(2, '0');
+  const lastDay = new Date(yr, month, 0).getDate();
+  document.getElementById('f-datefrom').value = `${yr}-${pad(month)}-01`;
+  document.getElementById('f-dateto').value   = `${yr}-${pad(month)}-${pad(lastDay)}`;
+  applyFilters();
+}
+
+// If user manually changes the date-from field, try to sync month selector
+function syncMonthFromDate() {
+  const v = document.getElementById('f-datefrom').value;
+  if (v) {
+    const m = parseInt(v.split('-')[1]);
+    document.getElementById('f-month').value = m || '';
+  }
+}
+
+function resetFilters() {
+  ['f-search','f-datefrom','f-dateto'].forEach(id => document.getElementById(id).value = '');
+  ['f-place','f-star','f-room'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-month').value = new Date().getMonth() + 1;
+  onMonthChange();
+}
+
+// Parse dates from the sheet — handles every common format:
+//   YYYY-MM-DD     → 2025-04-01  (recommended format)
+//   DD/MM/YYYY     → 01/04/2025
+//   DD-MM-YYYY     → 01-04-2025
+//   "1 January"    → assumes current year (good for year-round rates)
+//   "1 January 2025"
+//   "January 1"    → same
+//   "1 Jan 2025"
+//   "31 December"  → assumes current year
+function parseSheetDate(str) {
+  if (!str) return null;
+  str = str.trim();
+
+  // Format: YYYY-MM-DD  (ISO — the ideal format for your sheet)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return new Date(str);
+
+  // Format: DD/MM/YYYY or DD-MM-YYYY
+  if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(str)) {
+    const parts = str.split(/[\/\-]/);
+    return new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
+  }
+
+  // Formats involving month names like "1 January", "January 1", "1 Jan 2025", etc.
+  const MONTHS = {
+    january:1,february:2,march:3,april:4,may:5,june:6,
+    july:7,august:8,september:9,october:10,november:11,december:12,
+    jan:1,feb:2,mar:3,apr:4,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12
+  };
+
+  // Tokenise: split by spaces/commas
+  const tokens = str.toLowerCase().replace(/,/g,' ').split(/\s+/).filter(Boolean);
+  let day = null, month = null, year = new Date().getFullYear();
+
+  tokens.forEach(tok => {
+    const num = parseInt(tok);
+    if (!isNaN(num)) {
+      if (num > 31)       year  = num;   // 4-digit year
+      else if (day === null) day = num;  // first number is day
+    } else if (MONTHS[tok]) {
+      month = MONTHS[tok];
+    }
+  });
+
+  // "January" alone without a day → treat as 1st of that month
+  if (month && !day) day = 1;
+
+  if (day && month) {
+    const iso = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const d = new Date(iso);
+    return isNaN(d) ? null : d;
+  }
+
+  // Last resort: let the browser try
+  const fallback = new Date(str);
+  return isNaN(fallback) ? null : fallback;
+}
+
+// ============================================================
+// RENDER TABLE
+// ============================================================
+function renderTable() {
+  const tbody = document.getElementById('ratesBody');
+
+  if (filtered.length === 0 && allRates.length > 0) {
+    tbody.innerHTML = `<tr><td colspan="13"><div class="state-box">
+      <span class="icon">🔍</span>
+      <h3>No rates match your filters</h3>
+      <p>Try selecting a different month, destination, or clearing some filters.</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const dayBadge = r[COL.daytype] && r[COL.daytype].toLowerCase() !== 'all days'
+      ? `<div class="hotel-sub">📅 ${esc(r[COL.daytype])}</div>` : '';
+
+    const validPeriod = r[COL.from] || r[COL.to]
+      ? `<div class="date-range">${fmtDate(r[COL.from])} → ${fmtDate(r[COL.to])}</div>`
+      : '<span style="color:#c8d8e8;">—</span>';
+
+    const seasonBadge = r[COL.season]
+      ? `<span class="badge badge-season">${esc(r[COL.season])}</span>`
+      : '<span style="color:#c8d8e8;">—</span>';
+
+    return `<tr>
+      <td>
+        <div class="hotel-name">${esc(r[COL.hotel] || '—')}</div>
+        ${dayBadge}
+      </td>
+      <td><span class="badge badge-place">${esc(r[COL.place] || '—')}</span></td>
+      <td><span class="badge badge-star">${formatStar(r[COL.star])}</span></td>
+      <td>${esc(r[COL.room] || '—')}</td>
+      <td>${validPeriod}</td>
+      <td>${seasonBadge}</td>
+      ${rateCell(r[COL.ep])}
+      ${rateCell(r[COL.cp])}
+      ${rateCell(r[COL.map])}
+      ${rateCell(r[COL.ap])}
+      ${rateCell(r[COL.eb])}
+      ${rateCell(r[COL.cwb])}
+      <td style="font-size:11.5px;color:var(--muted);max-width:180px;line-height:1.4;">${esc(r[COL.notes] || '')}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Render a rate cell — formats number as ₹ or shows a dash
+function rateCell(val) {
+  if (!val || val === '-' || val.toLowerCase() === 'na' || val.toLowerCase() === 'n/a') {
+    return `<td class="td-rate na">—</td>`;
+  }
+  const num = parseFloat(String(val).replace(/[₹,\s]/g, ''));
+  if (isNaN(num) || num === 0) return `<td class="td-rate na">—</td>`;
+  return `<td class="td-rate">${CURRENCY}${num.toLocaleString('en-IN')}</td>`;
+}
+
+// Format a date string as "15 Apr '25"
+function fmtDate(str) {
+  if (!str) return '—';
+  const d = parseSheetDate(str);
+  if (!d || isNaN(d)) return str;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' });
+}
+
+// Format star category — if sheet contains just a number like "4",
+// display it as "4-Star" automatically
+function formatStar(val) {
+  if (!val) return '—';
+  const s = String(val).trim();
+  // If it's purely a digit (1–9), append "-Star"
+  if (/^\d$/.test(s)) return s + '-Star';
+  return s;
+}
+
+// HTML-escape helper
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// LOADING / ERROR STATES
+// ============================================================
+function setBodyLoading() {
+  document.getElementById('ratesBody').innerHTML = `
+    <tr><td colspan="13"><div class="state-box">
+      <span class="loader"></span><br><br>
+      <p>Fetching latest rates from Google Sheets…</p>
+    </div></td></tr>`;
+}
+
+function setBodyError(msg) {
+  document.getElementById('ratesBody').innerHTML = `
+    <tr><td colspan="13"><div class="state-box">
+      <span class="icon">⚠️</span>
+      <h3>Could not load rate data</h3>
+      <p>${esc(msg)}</p>
+      <p style="margin-top:10px;font-size:12px;">
+        Make sure your sheet is published:<br>
+        <em>File → Share → Publish to web → Choose sheet → CSV → Publish</em>
+      </p>
+    </div></td></tr>`;
+}
+
+// ============================================================
+// EXPORT FILTERED DATA TO CSV
+// ============================================================
+function exportCSV() {
+  if (filtered.length === 0) { showToast('Nothing to export — adjust filters first'); return; }
+
+  const cols = [
+    ['Hotel Name',    COL.hotel],
+    ['Place',         COL.place],
+    ['Star Category', COL.star],
+    ['Room Type',     COL.room],
+    ['Date From',     COL.from],
+    ['Date To',       COL.to],
+    ['Season',        COL.season],
+    ['Day Type',      COL.daytype],
+    ['EP',            COL.ep],
+    ['CP',            COL.cp],
+    ['MAP',           COL.map],
+    ['AP',            COL.ap],
+    ['EB',            COL.eb],
+    ['CWB',           COL.cwb],
+    ['Notes',         COL.notes],
+  ];
+
+  const header = cols.map(c => `"${c[0]}"`).join(',');
+  const rows = filtered.map(r =>
+    cols.map(c => `"${(r[c[1]] || '').replace(/"/g, '""')}"`).join(',')
+  );
+  const csvText = [header, ...rows].join('\n');
+
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const today = new Date().toISOString().slice(0, 10);
+  a.download = `emaar-hotel-rates-${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  showToast(`✓ Exported ${filtered.length} records`);
+}
+
+// ============================================================
+// SAMPLE DATA — lets the team preview the portal before setup
+// ============================================================
+function loadSampleData(silent = false) {
+  allRates = [
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-03-01', date_to:'2025-06-30', season_label:'Spring Peak',  day_type:'All Days', ep:'5500', cp:'6500', map:'8500', ap:'10000', eb:'2000', cwb:'1500', notes:'Houseboat view' },
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Suite',        date_from:'2025-03-01', date_to:'2025-06-30', season_label:'Spring Peak',  day_type:'All Days', ep:'9500', cp:'11000',map:'14000',ap:'16500', eb:'2500', cwb:'2000', notes:'Dal Lake suite' },
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-07-01', date_to:'2025-09-30', season_label:'Summer',       day_type:'All Days', ep:'4800', cp:'5800', map:'7800', ap:'9500',  eb:'1800', cwb:'1400', notes:'' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2200', cwb:'1800', notes:'Ski pass available' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'Weekend',  ep:'7500', cp:'8800', map:'11000',ap:'13000', eb:'2500', cwb:'2000', notes:'Weekend surcharge' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'Weekday',  ep:'6500', cp:'7800', map:'9800', ap:'11800', eb:'2500', cwb:'2000', notes:'' },
+    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-10-31', season_label:'Summer',       day_type:'All Days', ep:'3800', cp:'4600', map:'6000', ap:'7200',  eb:'1500', cwb:'1200', notes:'Valley facing' },
+    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Suite',        date_from:'2025-04-01', date_to:'2025-10-31', season_label:'Summer',       day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2000', cwb:'1800', notes:'Betab Valley view' },
+    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-05-01', date_to:'2025-10-15', season_label:'Open Season',  day_type:'All Days', ep:'4500', cp:'5500', map:'7000', ap:'8500',  eb:'1800', cwb:'1500', notes:'' },
+    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-05-01', date_to:'2025-10-15', season_label:'Open Season',  day_type:'All Days', ep:'5500', cp:'6800', map:'8500', ap:'10500', eb:'2000', cwb:'1600', notes:'Mountain facing' },
+    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-09-30', season_label:'Peak Season',  day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'Dal Lake floating' },
+    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Premium',      date_from:'2025-04-01', date_to:'2025-09-30', season_label:'Peak Season',  day_type:'All Days', ep:'9500', cp:'11500',map:'15000',ap:'18000', eb:'3000', cwb:'2500', notes:'Upper deck premium' },
+    { hotel_name:'Meadow Inn',          place:'Doodhpathri',star_category:'3-Star',  room_type:'Deluxe',       date_from:'2025-06-01', date_to:'2025-09-15', season_label:'Summer',       day_type:'All Days', ep:'3200', cp:'3900', map:'5200', ap:'6500',  eb:'1400', cwb:'1000', notes:'Off-beat destination' },
+    { hotel_name:'Grand Mughal Hotel',  place:'Srinagar',  star_category:'5-Star',   room_type:'Super Deluxe', date_from:'2025-01-01', date_to:'2025-12-31', season_label:'Year Round',   day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'City centre' },
+  ];
+
+  hideBanner();
+  buildFilterOptions();
+  applyFilters();
+  if (!silent) showToast('✓ Sample data loaded — connect your Google Sheet for real data');
+  document.getElementById('syncBadge').style.display = 'inline';
+  document.getElementById('syncBadge').textContent = 'Sample Data';
+}
+
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
+function showToast(msg, duration = 3500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+</script>
+
+</body>
+</html>
