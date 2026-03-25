@@ -713,7 +713,6 @@
             <th>Category</th>
             <th>Room Type</th>
             <th>Valid Period</th>
-            <th>Season</th>
             <th class="th-rate">EP</th>
             <th class="th-rate">CP</th>
             <th class="th-rate">MAP</th>
@@ -769,7 +768,6 @@ const COL = {
   room:    'room_type',
   from:    'date_from',
   to:      'date_to',
-  season:  'season_label',
   daytype: 'day_type',
   ep:      'ep',
   cp:      'cp',
@@ -1095,11 +1093,7 @@ function renderTable() {
 
     const validPeriod = r[COL.from] || r[COL.to]
       ? `<div class="date-range">${fmtDate(r[COL.from])} → ${fmtDate(r[COL.to])}</div>`
-      : '<span style="color:#c8d8e8;">—</span>';
-
-    const seasonBadge = r[COL.season]
-      ? `<span class="badge badge-season">${esc(r[COL.season])}</span>`
-      : '<span style="color:#c8d8e8;">—</span>';
+      : '<span style="color:#c8d8e8;">—</span>'
 
     return `<tr>
       <td>
@@ -1110,7 +1104,6 @@ function renderTable() {
       <td><span class="badge badge-star">${formatStar(r[COL.star])}</span></td>
       <td>${esc(r[COL.room] || '—')}</td>
       <td>${validPeriod}</td>
-      <td>${seasonBadge}</td>
       ${rateCell(r[COL.ep])}
       ${rateCell(r[COL.cp])}
       ${rateCell(r[COL.map])}
@@ -1194,7 +1187,6 @@ function exportCSV() {
     ['Room Type',     COL.room],
     ['Date From',     COL.from],
     ['Date To',       COL.to],
-    ['Season',        COL.season],
     ['Day Type',      COL.daytype],
     ['EP',            COL.ep],
     ['CP',            COL.cp],
@@ -1228,20 +1220,20 @@ function exportCSV() {
 // ============================================================
 function loadSampleData(silent = false) {
   allRates = [
-    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-03-01', date_to:'2025-06-30', season_label:'Spring Peak',  day_type:'All Days', ep:'5500', cp:'6500', map:'8500', ap:'10000', eb:'2000', cwb:'1500', notes:'Houseboat view' },
-    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Suite',        date_from:'2025-03-01', date_to:'2025-06-30', season_label:'Spring Peak',  day_type:'All Days', ep:'9500', cp:'11000',map:'14000',ap:'16500', eb:'2500', cwb:'2000', notes:'Dal Lake suite' },
-    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-07-01', date_to:'2025-09-30', season_label:'Summer',       day_type:'All Days', ep:'4800', cp:'5800', map:'7800', ap:'9500',  eb:'1800', cwb:'1400', notes:'' },
-    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2200', cwb:'1800', notes:'Ski pass available' },
-    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'Weekend',  ep:'7500', cp:'8800', map:'11000',ap:'13000', eb:'2500', cwb:'2000', notes:'Weekend surcharge' },
-    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28', season_label:'Ski Season',   day_type:'Weekday',  ep:'6500', cp:'7800', map:'9800', ap:'11800', eb:'2500', cwb:'2000', notes:'' },
-    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-10-31', season_label:'Summer',       day_type:'All Days', ep:'3800', cp:'4600', map:'6000', ap:'7200',  eb:'1500', cwb:'1200', notes:'Valley facing' },
-    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Suite',        date_from:'2025-04-01', date_to:'2025-10-31', season_label:'Summer',       day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2000', cwb:'1800', notes:'Betab Valley view' },
-    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-05-01', date_to:'2025-10-15', season_label:'Open Season',  day_type:'All Days', ep:'4500', cp:'5500', map:'7000', ap:'8500',  eb:'1800', cwb:'1500', notes:'' },
-    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-05-01', date_to:'2025-10-15', season_label:'Open Season',  day_type:'All Days', ep:'5500', cp:'6800', map:'8500', ap:'10500', eb:'2000', cwb:'1600', notes:'Mountain facing' },
-    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-09-30', season_label:'Peak Season',  day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'Dal Lake floating' },
-    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Premium',      date_from:'2025-04-01', date_to:'2025-09-30', season_label:'Peak Season',  day_type:'All Days', ep:'9500', cp:'11500',map:'15000',ap:'18000', eb:'3000', cwb:'2500', notes:'Upper deck premium' },
-    { hotel_name:'Meadow Inn',          place:'Doodhpathri',star_category:'3-Star',  room_type:'Deluxe',       date_from:'2025-06-01', date_to:'2025-09-15', season_label:'Summer',       day_type:'All Days', ep:'3200', cp:'3900', map:'5200', ap:'6500',  eb:'1400', cwb:'1000', notes:'Off-beat destination' },
-    { hotel_name:'Grand Mughal Hotel',  place:'Srinagar',  star_category:'5-Star',   room_type:'Super Deluxe', date_from:'2025-01-01', date_to:'2025-12-31', season_label:'Year Round',   day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'City centre' },
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-03-01', date_to:'2025-06-30',  day_type:'All Days', ep:'5500', cp:'6500', map:'8500', ap:'10000', eb:'2000', cwb:'1500', notes:'Houseboat view' },
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Suite',        date_from:'2025-03-01', date_to:'2025-06-30',  day_type:'All Days', ep:'9500', cp:'11000',map:'14000',ap:'16500', eb:'2500', cwb:'2000', notes:'Dal Lake suite' },
+    { hotel_name:'The Grand Palace',    place:'Srinagar',  star_category:'5-Star',   room_type:'Deluxe',       date_from:'2025-07-01', date_to:'2025-09-30',  day_type:'All Days', ep:'4800', cp:'5800', map:'7800', ap:'9500',  eb:'1800', cwb:'1400', notes:'' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-12-01', date_to:'2026-02-28',  day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2200', cwb:'1800', notes:'Ski pass available' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28',  day_type:'Weekend',  ep:'7500', cp:'8800', map:'11000',ap:'13000', eb:'2500', cwb:'2000', notes:'Weekend surcharge' },
+    { hotel_name:'Hotel Alpine Gulmarg',place:'Gulmarg',   star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-12-01', date_to:'2026-02-28',  day_type:'Weekday',  ep:'6500', cp:'7800', map:'9800', ap:'11800', eb:'2500', cwb:'2000', notes:'' },
+    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-10-31',  day_type:'All Days', ep:'3800', cp:'4600', map:'6000', ap:'7200',  eb:'1500', cwb:'1200', notes:'Valley facing' },
+    { hotel_name:'Pine Valley Resort',  place:'Pahalgam',  star_category:'3-Star',   room_type:'Suite',        date_from:'2025-04-01', date_to:'2025-10-31',  day_type:'All Days', ep:'6000', cp:'7200', map:'9000', ap:'11000', eb:'2000', cwb:'1800', notes:'Betab Valley view' },
+    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Deluxe',       date_from:'2025-05-01', date_to:'2025-10-15',  day_type:'All Days', ep:'4500', cp:'5500', map:'7000', ap:'8500',  eb:'1800', cwb:'1500', notes:'' },
+    { hotel_name:'Snow Heights Hotel',  place:'Sonamarg',  star_category:'4-Star',   room_type:'Super Deluxe', date_from:'2025-05-01', date_to:'2025-10-15',  day_type:'All Days', ep:'5500', cp:'6800', map:'8500', ap:'10500', eb:'2000', cwb:'1600', notes:'Mountain facing' },
+    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Deluxe',       date_from:'2025-04-01', date_to:'2025-09-30',  day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'Dal Lake floating' },
+    { hotel_name:'Heritage Houseboats', place:'Srinagar',  star_category:'Heritage', room_type:'Premium',      date_from:'2025-04-01', date_to:'2025-09-30',  day_type:'All Days', ep:'9500', cp:'11500',map:'15000',ap:'18000', eb:'3000', cwb:'2500', notes:'Upper deck premium' },
+    { hotel_name:'Meadow Inn',          place:'Doodhpathri',star_category:'3-Star',  room_type:'Deluxe',       date_from:'2025-06-01', date_to:'2025-09-15',  day_type:'All Days', ep:'3200', cp:'3900', map:'5200', ap:'6500',  eb:'1400', cwb:'1000', notes:'Off-beat destination' },
+    { hotel_name:'Grand Mughal Hotel',  place:'Srinagar',  star_category:'5-Star',   room_type:'Super Deluxe', date_from:'2025-01-01', date_to:'2025-12-31',  day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'City centre' },
   ];
 
   hideBanner();
