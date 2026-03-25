@@ -792,7 +792,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedUrl = localStorage.getItem('emaar_sheet_url');
   if (savedUrl) {
     document.getElementById('sheetUrlInput').value = savedUrl;
-    if (!silent) hideBanner();
+    hideBanner();
     loadRates();
   } else {
     // No sheet connected yet — load sample data so the portal
@@ -1236,7 +1236,7 @@ function loadSampleData(silent = false) {
     { hotel_name:'Grand Mughal Hotel',  place:'Srinagar',  star_category:'5-Star',   room_type:'Super Deluxe', date_from:'2025-01-01', date_to:'2025-12-31',  day_type:'All Days', ep:'7000', cp:'8500', map:'11000',ap:'13500', eb:'2500', cwb:'2000', notes:'City centre' },
   ];
 
-  hideBanner();
+  if (!silent) hideBanner();
   buildFilterOptions();
   applyFilters();
   if (!silent) showToast('✓ Sample data loaded — connect your Google Sheet for real data');
