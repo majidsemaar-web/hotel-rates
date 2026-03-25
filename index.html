@@ -802,9 +802,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // looks full and useful from the very first visit
     loadSampleData(/*silent=*/true);
   }
-  // Default month = current month
-  document.getElementById('f-month').value = new Date().getMonth() + 1;
-  onMonthChange();
+  // Default month = all months
+  document.getElementById('f-month').value = '';
+applyFilters();
 });
 
 // ============================================================
